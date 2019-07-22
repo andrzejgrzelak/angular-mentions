@@ -16,6 +16,7 @@ const KEY_UP = 38;
 const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
 const KEY_2 = 50;
+const KEY_BUFFERED = 229;
 
 /**
  * Angular 2 Mentions.
@@ -27,12 +28,13 @@ const KEY_2 = 50;
   selector: '[mention], [mentionConfig]',
   host: {
     '(keydown)': 'keyHandler($event)',
+    '(textInput)': 'textInputHandler($event)',
     '(blur)': 'blurHandler($event)'
   }
 })
 export class MentionDirective implements OnChanges {
 
-  // stores the items passed to the mentions directive and used to populate the root items in mentionConfig 
+  // stores the items passed to the mentions directive and used to populate the root items in mentionConfig
   private mentionItems:any[];
 
   @Input('mention') set mention(items:any[]) {
@@ -69,6 +71,7 @@ export class MentionDirective implements OnChanges {
   startNode;
   searchList: MentionListComponent;
   stopSearch: boolean;
+  lastKeyCode: number;
   iframe: any; // optional
 
   constructor(
@@ -130,7 +133,15 @@ export class MentionDirective implements OnChanges {
       this.activeConfig = config;
       this.updateSearchList();
     }
-  }  
+  }
+
+  // textInput event is fired on android where all keyDown events have keyCode 229
+  textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    if (this.lastKeyCode === KEY_BUFFERED) {
+      let keyCode = event.data.charCodeAt(0);
+      this.keyHandler({keyCode:keyCode}, nativeElement);
+    }
+  }
 
   setIframe(iframe: HTMLIFrameElement) {
     this.iframe = iframe;
@@ -154,6 +165,7 @@ export class MentionDirective implements OnChanges {
   }
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    this.lastKeyCode = event.keyCode;
     let val: string = getValue(nativeElement);
     let pos = getCaretPosition(nativeElement, this.iframe);
     let charPressed = event.key;
@@ -162,9 +174,6 @@ export class MentionDirective implements OnChanges {
       if (!event.shiftKey && (charCode >= 65 && charCode <= 90)) {
         charPressed = String.fromCharCode(charCode + 32);
       }
-      // else if (event.shiftKey && charCode === KEY_2) {
-      //   charPressed = this.config.triggerChar;
-      // }
       else {
         // TODO (dmacfarlane) fix this for non-alpha keys
         // http://stackoverflow.com/questions/2220196/how-to-decode-character-pressed-from-jquerys-keydowns-event-handler?lq=1
