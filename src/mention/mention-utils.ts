@@ -1,12 +1,13 @@
 // DOM element manipulation functions...
 //
 
+import {forEach} from '@angular/router/src/utils/collection';
+
 function setValue(el: HTMLInputElement, value: any) {
   //console.log("setValue", el.nodeName, "["+value+"]");
   if (isInputOrTextAreaElement(el)) {
     el.value = value;
-  }
-  else {
+  } else {
     el.textContent = value;
   }
 }
@@ -28,8 +29,7 @@ export function insertValue(
     let val = getValue(el);
     setValue(el, val.substring(0, start) + text + val.substring(end, val.length));
     setCaretPosition(el, start + text.length, iframe);
-  }
-  else if (!noRecursion) {
+  } else if (!noRecursion) {
     let selObj: Selection = getWindowSelection(iframe);
     if (selObj && selObj.rangeCount > 0) {
       var selRange = selObj.getRangeAt(0);
@@ -56,8 +56,7 @@ export function setCaretPosition(el: HTMLInputElement, pos: number, iframe: HTML
   if (isInputOrTextAreaElement(el) && el.selectionStart) {
     el.focus();
     el.setSelectionRange(pos, pos);
-  }
-  else {
+  } else {
     let range = getDocument(iframe).createRange();
     range.setStart(el, pos);
     range.collapse(true);
@@ -72,10 +71,9 @@ export function getCaretPosition(el: HTMLInputElement, iframe: HTMLIFrameElement
   if (isInputOrTextAreaElement(el)) {
     var val = el.value;
     return val.slice(0, el.selectionStart).length;
-  }
-  else {
+  } else {
     var selObj = getWindowSelection(iframe); //window.getSelection();
-    if (selObj.rangeCount>0) {
+    if (selObj.rangeCount > 0) {
       var selRange = selObj.getRangeAt(0);
       var position = selRange.startOffset;
       return position;
@@ -136,8 +134,8 @@ export function getContentEditableCaretCoords(ctx: { iframe: HTMLIFrameElement, 
 }
 
 function localToRelativeCoordinates(
-  ctx: { iframe: HTMLIFrameElement, parent?: Element }, 
-  element: Element, 
+  ctx: { iframe: HTMLIFrameElement, parent?: Element },
+  element: Element,
   coordinates: { top: number; left: number }
 ) {
   let obj = <HTMLElement>element;
@@ -172,4 +170,18 @@ function localToRelativeCoordinates(
       iframe = null;
     }
   }
+}
+
+export function findInputRecursive(el: HTMLElement) {
+  if (isInputOrTextAreaElement(el)) {
+    return el;
+  }
+  for (let i = 0; i < el.children.length; i++) {
+    const child = <HTMLElement>el.children[i];
+    const recurseResult = findInputRecursive(child);
+    if (recurseResult) {
+      return recurseResult;
+    }
+  }
+  return null;
 }

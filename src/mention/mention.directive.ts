@@ -1,9 +1,9 @@
-import {Directive, ElementRef, ComponentFactoryResolver, ViewContainerRef, TemplateRef} from '@angular/core';
+import {Directive, ElementRef, ComponentFactoryResolver, ViewContainerRef, TemplateRef, AfterViewInit} from '@angular/core';
 import {Input, EventEmitter, Output, OnChanges, SimpleChanges} from '@angular/core';
 
 import {MentionConfig} from './mention-config';
 import {MentionListComponent} from './mention-list.component';
-import {getValue, insertValue, getCaretPosition, setCaretPosition} from './mention-utils';
+import {getValue, insertValue, getCaretPosition, setCaretPosition, findInputRecursive} from './mention-utils';
 
 const KEY_BACKSPACE = 8;
 const KEY_TAB = 9;
@@ -31,7 +31,7 @@ const KEY_BUFFERED = 229;
     '(blur)': 'blurHandler($event)'
   }
 })
-export class MentionDirective implements OnChanges {
+export class MentionDirective implements OnChanges, AfterViewInit {
 
   // stores the items passed to the mentions directive and used to populate the root items in mentionConfig
   private mentionItems: any[];
@@ -83,13 +83,19 @@ export class MentionDirective implements OnChanges {
     private _componentResolver: ComponentFactoryResolver,
     private _viewContainerRef: ViewContainerRef
   ) {
+
   }
+
 
   ngOnChanges(changes: SimpleChanges) {
     // console.log('config change', changes);
     if (changes['mention'] || changes['mentionConfig']) {
       this.updateConfig();
     }
+  }
+
+  ngAfterViewInit(): void {
+    this._element = new ElementRef(findInputRecursive(this._element.nativeElement));
   }
 
   private updateConfig() {
@@ -142,6 +148,7 @@ export class MentionDirective implements OnChanges {
 
   // textInput event is fired on android where all keyDown events have keyCode 229
   textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    nativeElement = this._element.nativeElement;
     if (this.lastKeyCode === KEY_BUFFERED) {
       let keyCode = event.data.charCodeAt(0);
       console.debug('mention.directive.ts textInputHandler, keyCode:', event, keyCode);
@@ -171,6 +178,7 @@ export class MentionDirective implements OnChanges {
   }
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    nativeElement = this._element.nativeElement;
     this.lastKeyCode = event.keyCode;
     let val: string = getValue(nativeElement);
     let pos = getCaretPosition(nativeElement, this.iframe);
