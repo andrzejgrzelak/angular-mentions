@@ -15,7 +15,6 @@ const KEY_LEFT = 37;
 const KEY_UP = 38;
 const KEY_RIGHT = 39;
 const KEY_DOWN = 40;
-const KEY_2 = 50;
 const KEY_BUFFERED = 229;
 
 /**
@@ -62,7 +61,12 @@ export class MentionDirective implements OnChanges {
 
   // option to diable internal filtering. can be used to show the full list returned
   // from an async operation (or allows a custom filter function to be used - in future)
-  private disableSearch: boolean = false;
+  @Input() set mentionDisableSearch(disableSearch: boolean) {
+    this.disableSearch = disableSearch;
+  }
+
+  disableSearch = false;
+
 
   private triggerChars: { [key: string]: MentionConfig } = {};
 
@@ -252,7 +256,7 @@ export class MentionDirective implements OnChanges {
           this.stopEvent(event);
           return false;
         } else {
-          console.debug('mention.directive.ts keyHandler, val:', val,event.keyCode);
+          console.debug('mention.directive.ts keyHandler, val:', val, event.keyCode);
           let mention = val.substring(this.startPos + 1, pos);
           if (event.keyCode !== KEY_BACKSPACE && event.keyCode !== KEY_BUFFERED) {
             mention += charPressed;
