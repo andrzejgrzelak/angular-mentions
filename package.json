@@ -1,6 +1,6 @@
 {
   "name": "angular-mentions",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Angular mentions for text fields.",
   "keywords": [
     "angular",
@@ -22,7 +22,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "prepare": "ng build",
+    "prepare": "ng build && npm run dist",
     "dist": "ngc -p src/mention"
   },
   "private": false,
