@@ -1143,6 +1143,7 @@ var MentionDirective = (function () {
         if (nativeElement === void 0) { nativeElement = this._element.nativeElement; }
         if (this.lastKeyCode === KEY_BUFFERED) {
             var keyCode = event.data.charCodeAt(0);
+            console.debug('mention.directive.ts textInputHandler, keyCode:', event, keyCode);
             this.keyHandler({ keyCode: keyCode }, nativeElement);
         }
     };
@@ -1224,9 +1225,9 @@ var MentionDirective = (function () {
                         // between element types (div and iframe do not preserve the space)
                         Object(__WEBPACK_IMPORTED_MODULE_3__mention_utils__["d" /* insertValue */])(nativeElement, this.startPos, pos, this.activeConfig.mentionSelect(this.searchList.activeItem), this.iframe);
                         // fire input event so angular bindings are updated
-                        if ("createEvent" in document) {
-                            var evt = document.createEvent("HTMLEvents");
-                            evt.initEvent("input", false, true);
+                        if ('createEvent' in document) {
+                            var evt = document.createEvent('HTMLEvents');
+                            evt.initEvent('input', false, true);
                             nativeElement.dispatchEvent(evt);
                         }
                         this.startPos = -1;
@@ -1254,6 +1255,7 @@ var MentionDirective = (function () {
                     return false;
                 }
                 else {
+                    console.debug('mention.directive.ts keyHandler, val:', val);
                     var mention = val.substring(this.startPos + 1, pos);
                     if (event.keyCode !== KEY_BACKSPACE) {
                         mention += charPressed;
@@ -1297,7 +1299,7 @@ var MentionDirective = (function () {
             this.searchList.itemTemplate = this.mentionListTemplate;
             componentRef.instance['itemClick'].subscribe(function () {
                 nativeElement.focus();
-                var fakeKeydown = { "keyCode": KEY_ENTER, "wasClick": true };
+                var fakeKeydown = { 'keyCode': KEY_ENTER, 'wasClick': true };
                 _this.keyHandler(fakeKeydown, nativeElement);
             });
         }
