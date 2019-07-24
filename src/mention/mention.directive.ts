@@ -292,7 +292,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   sendSearchTerm() {
     const nativeElement = this._element.nativeElement;
     const val = getValue(nativeElement);
-    console.degug('sendSearchTerm val:', val);
+    console.debug('sendSearchTerm val:', val);
     const pos = getCaretPosition(nativeElement, this.iframe);
     this.searchString = val.substring(this.startPos + 1, pos);
     this.searchTerm.emit(this.searchString);
