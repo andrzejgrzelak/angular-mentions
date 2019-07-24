@@ -3,7 +3,7 @@ import {Input, EventEmitter, Output, OnChanges, SimpleChanges} from '@angular/co
 
 import {MentionConfig} from './mention-config';
 import {MentionListComponent} from './mention-list.component';
-import {getValue, insertValue, getCaretPosition, setCaretPosition, findInputRecursive} from './mention-utils';
+import {findInputRecursive, getCaretPosition, getValue, insertValue, setCaretPosition} from './mention-utils';
 
 const KEY_BACKSPACE = 8;
 const KEY_TAB = 9;
@@ -273,7 +273,12 @@ export class MentionDirective implements OnChanges, AfterViewInit {
           val = getValue(nativeElement);
           console.debug('mention.directive.ts keyHandler, val:', val, event.keyCode);
           let mention = val.substring(this.startPos + 1, pos);
-          if (event.keyCode !== KEY_BACKSPACE && event.keyCode !== KEY_BUFFERED) {
+          if (event.keyCode === KEY_BUFFERED) {
+            // We're on soft keyboard so we need to read content from input on next tick
+            setTimeout(this.sendSearchTerm.bind(this), 1);
+            return;
+          }
+          if (event.keyCode !== KEY_BACKSPACE) {
             mention += charPressed;
           }
           this.searchString = mention;
@@ -282,6 +287,16 @@ export class MentionDirective implements OnChanges, AfterViewInit {
         }
       }
     }
+  }
+
+  sendSearchTerm() {
+    const nativeElement = this._element.nativeElement;
+    const val = getValue(nativeElement);
+    console.degug('sendSearchTerm val:', val);
+    const pos = getCaretPosition(nativeElement, this.iframe);
+    this.searchString = val.substring(this.startPos + 1, pos);
+    this.searchTerm.emit(this.searchString);
+    this.updateSearchList();
   }
 
   updateSearchList() {
