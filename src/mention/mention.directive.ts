@@ -27,6 +27,7 @@ const KEY_BUFFERED = 229;
   selector: '[mention], [mentionConfig]',
   host: {
     '(keydown)': 'keyHandler($event)',
+    '(keypress)': 'keyPressHandler($event)',
     '(textInput)': 'textInputHandler($event)',
     '(blur)': 'blurHandler($event)'
   }
@@ -154,6 +155,11 @@ export class MentionDirective implements OnChanges, AfterViewInit {
       console.debug('mention.directive.ts textInputHandler, keyCode:', event, keyCode);
       this.keyHandler({keyCode: keyCode}, nativeElement);
     }
+  }
+
+  // keypress event is fired on android where all keyDown events have keyCode 229
+  keyPressHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    console.debug('Keypress:', event);
   }
 
   setIframe(iframe: HTMLIFrameElement) {
