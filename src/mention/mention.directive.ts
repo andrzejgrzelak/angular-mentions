@@ -264,6 +264,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
           this.stopEvent(event);
           return false;
         } else {
+          val = getValue(nativeElement);
           console.debug('mention.directive.ts keyHandler, val:', val, event.keyCode);
           let mention = val.substring(this.startPos + 1, pos);
           if (event.keyCode !== KEY_BACKSPACE && event.keyCode !== KEY_BUFFERED) {
