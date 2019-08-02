@@ -327,12 +327,6 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   showSearchList(nativeElement: HTMLInputElement) {
-    if (this.activeConfig.disableMentionResultbox) {
-      if (this.searchList) {
-        this.searchList.hidden = true;
-      }
-      return;
-    }
     if (this.searchList == null) {
       let componentFactory = this._componentResolver.resolveComponentFactory(MentionListComponent);
       let componentRef = this._viewContainerRef.createComponent(componentFactory);
@@ -349,6 +343,10 @@ export class MentionDirective implements OnChanges, AfterViewInit {
       this.searchList.activeIndex = 0;
       this.searchList.position(nativeElement, this.iframe, this.activeConfig.dropUp);
       window.setTimeout(() => this.searchList.resetScroll());
+    }
+    if (this.activeConfig.disableMentionResultbox) {
+      this.searchList.display = false;
+      return;
     }
   }
 }
