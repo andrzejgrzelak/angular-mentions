@@ -28,7 +28,9 @@ export function insertValue(
   if (isTextElement(el)) {
     let val = getValue(el);
     setValue(el, val.substring(0, start) + text + val.substring(end, val.length));
-    setCaretPosition(el, start + text.length, iframe);
+    setTimeout(() => {
+      setCaretPosition(el, start + text.length, iframe);
+    }, 0);
   } else if (!noRecursion) {
     let selObj: Selection = getWindowSelection(iframe);
     if (selObj && selObj.rangeCount > 0) {
@@ -53,7 +55,7 @@ export function isTextElement(el: HTMLElement): boolean {
 
 export function setCaretPosition(el: HTMLInputElement, pos: number, iframe: HTMLIFrameElement = null) {
   //console.log("setCaretPosition", pos, el, iframe==null);
-  if (isInputOrTextAreaElement(el) && el.selectionStart) {
+  if (isInputOrTextAreaElement(el)) {
     el.focus();
     el.setSelectionRange(pos, pos);
   } else {
