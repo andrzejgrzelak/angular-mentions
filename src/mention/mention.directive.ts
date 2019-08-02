@@ -1,5 +1,4 @@
-import {Directive, ElementRef, ComponentFactoryResolver, ViewContainerRef, TemplateRef, AfterViewInit} from '@angular/core';
-import {Input, EventEmitter, Output, OnChanges, SimpleChanges} from '@angular/core';
+import {AfterViewInit, ComponentFactoryResolver, Directive, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
 
 import {MentionConfig} from './mention-config';
 import {MentionListComponent} from './mention-list.component';
@@ -238,17 +237,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
           if (event.keyCode === KEY_TAB || event.keyCode === KEY_ENTER) {
             this.stopEvent(event);
             this.searchList.hidden = true;
-            // value is inserted without a trailing space for consistency
-            // between element types (div and iframe do not preserve the space)
-            insertValue(nativeElement, this.startPos, pos,
-              this.activeConfig.mentionSelect(this.searchList.activeItem), this.iframe);
-            // fire input event so angular bindings are updated
-            if ('createEvent' in document) {
-              var evt = document.createEvent('HTMLEvents');
-              evt.initEvent('input', false, true);
-              nativeElement.dispatchEvent(evt);
-            }
-            this.startPos = -1;
+            this.insertMention(this.searchList.activeItem);
             return false;
           } else if (event.keyCode === KEY_ESCAPE) {
             this.stopEvent(event);
@@ -289,6 +278,22 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     }
   }
 
+  public insertMention(selected:any) {
+    const nativeElement = this._element.nativeElement;
+    const pos = getCaretPosition(nativeElement, this.iframe);
+    // value is inserted without a trailing space for consistency
+    // between element types (div and iframe do not preserve the space)
+    insertValue(nativeElement, this.startPos, pos,
+      this.activeConfig.mentionSelect(selected), this.iframe);
+    // fire input event so angular bindings are updated
+    if ('createEvent' in document) {
+      const evt = document.createEvent('HTMLEvents');
+      evt.initEvent('input', false, true);
+      nativeElement.dispatchEvent(evt);
+    }
+    this.startPos = -1;
+  }
+
   sendSearchTerm() {
     const nativeElement = this._element.nativeElement;
     const val = getValue(nativeElement);
@@ -322,6 +327,12 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   showSearchList(nativeElement: HTMLInputElement) {
+    if (this.activeConfig.disableMentionResultbox) {
+      if (this.searchList) {
+        this.searchList.hidden = true;
+      }
+      return;
+    }
     if (this.searchList == null) {
       let componentFactory = this._componentResolver.resolveComponentFactory(MentionListComponent);
       let componentRef = this._viewContainerRef.createComponent(componentFactory);
