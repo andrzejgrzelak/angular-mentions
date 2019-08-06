@@ -151,14 +151,13 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     nativeElement = this._element.nativeElement;
     if (this.lastKeyCode === KEY_BUFFERED) {
       let keyCode = event.data.charCodeAt(0);
-      console.debug('mention.directive.ts textInputHandler, keyCode:', event, keyCode);
       this.keyHandler({keyCode: keyCode}, nativeElement);
     }
   }
 
   // keypress event is fired on android where all keyDown events have keyCode 229
   keyPressHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    console.debug('Keypress:', event);
+
   }
 
   setIframe(iframe: HTMLIFrameElement) {
@@ -260,7 +259,6 @@ export class MentionDirective implements OnChanges, AfterViewInit {
           return false;
         } else {
           val = getValue(nativeElement);
-          console.debug('mention.directive.ts keyHandler, val:', val, event.keyCode);
           let mention = val.substring(this.startPos + 1, pos);
           if (event.keyCode === KEY_BUFFERED) {
             // We're on soft keyboard so we need to read content from input on next tick
@@ -278,7 +276,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     }
   }
 
-  public insertMention(selected:any) {
+  public insertMention(selected: any) {
     const nativeElement = this._element.nativeElement;
     const pos = getCaretPosition(nativeElement, this.iframe);
     // value is inserted without a trailing space for consistency
@@ -292,12 +290,17 @@ export class MentionDirective implements OnChanges, AfterViewInit {
       nativeElement.dispatchEvent(evt);
     }
     this.startPos = -1;
+    this.clearSearchbox();
+  }
+
+  clearSearchbox() {
+    this.activeConfig.items = [];
+    this.updateSearchList();
   }
 
   sendSearchTerm() {
     const nativeElement = this._element.nativeElement;
     const val = getValue(nativeElement);
-    console.debug('sendSearchTerm val:', val);
     const pos = getCaretPosition(nativeElement, this.iframe);
     this.searchString = val.substring(this.startPos + 1, pos);
     this.searchTerm.emit(this.searchString);
