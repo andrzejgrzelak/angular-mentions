@@ -211,6 +211,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
       this.startNode = (this.iframe ? this.iframe.contentWindow.getSelection() : window.getSelection()).anchorNode;
       this.stopSearch = false;
       this.searchString = null;
+      this.clearSearchbox();
       this.showSearchList(nativeElement);
       this.updateSearchList();
     } else if (this.startPos >= 0 && !this.stopSearch) {
@@ -291,11 +292,11 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     }
     this.startPos = -1;
     this.clearSearchbox();
+    this.updateSearchList();
   }
 
   clearSearchbox() {
     this.activeConfig.items = [];
-    this.updateSearchList();
   }
 
   sendSearchTerm() {
