@@ -50,6 +50,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     triggerChar: '@',
     labelKey: 'label',
     maxItems: -1,
+    debugEvents: false,
     mentionSelect: (item: any) => this.activeConfig.triggerChar + item[this.activeConfig.labelKey]
   }
 
@@ -148,6 +149,10 @@ export class MentionDirective implements OnChanges, AfterViewInit {
 
   // textInput event is fired on android where all keyDown events have keyCode 229
   textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    if (this.activeConfig.debugEvents) {
+      // tslint:disable-next-line:no-console
+      console.debug('mention.directive textInputHandler:', event);
+    }
     nativeElement = this._element.nativeElement;
     if (this.lastKeyCode === KEY_BUFFERED) {
       let keyCode = event.data.charCodeAt(0);
@@ -157,7 +162,10 @@ export class MentionDirective implements OnChanges, AfterViewInit {
 
   // keypress event is fired on android where all keyDown events have keyCode 229
   keyPressHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-
+    if (this.activeConfig.debugEvents) {
+      // tslint:disable-next-line:no-console
+      console.debug('mention.directive keyPressHandler:', event);
+    }
   }
 
   setIframe(iframe: HTMLIFrameElement) {
@@ -174,6 +182,10 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   blurHandler(event: any) {
+    if (this.activeConfig.debugEvents) {
+      // tslint:disable-next-line:no-console
+      console.debug('mention.directive blurHandler:', event);
+    }
     this.stopEvent(event);
     this.stopSearch = true;
     if (this.searchList) {
@@ -182,6 +194,10 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    if (this.activeConfig.debugEvents) {
+      console.debug('mention.directive keyHandler:', event);
+    }
+
     nativeElement = this._element.nativeElement;
     this.lastKeyCode = event.keyCode;
     let val: string = getValue(nativeElement);
