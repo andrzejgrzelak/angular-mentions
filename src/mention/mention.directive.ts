@@ -149,7 +149,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
 
   // textInput event is fired on android where all keyDown events have keyCode 229
   textInputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    if (this.activeConfig.debugEvents) {
+    if (this.mentionConfig.debugEvents) {
       // tslint:disable-next-line:no-console
       console.debug('mention.directive textInputHandler:', event);
     }
@@ -162,7 +162,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
 
   // keypress event is fired on android where all keyDown events have keyCode 229
   keyPressHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    if (this.activeConfig.debugEvents) {
+    if (this.mentionConfig.debugEvents) {
       // tslint:disable-next-line:no-console
       console.debug('mention.directive keyPressHandler:', event);
     }
@@ -182,7 +182,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   blurHandler(event: any) {
-    if (this.activeConfig.debugEvents) {
+    if (this.mentionConfig.debugEvents) {
       // tslint:disable-next-line:no-console
       console.debug('mention.directive blurHandler:', event);
     }
@@ -194,7 +194,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   keyHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
-    if (this.activeConfig.debugEvents) {
+    if (this.mentionConfig.debugEvents) {
       console.debug('mention.directive keyHandler:', event);
     }
 
