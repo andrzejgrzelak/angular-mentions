@@ -28,6 +28,7 @@ const KEY_BUFFERED = 229;
     '(keydown)': 'keyHandler($event)',
     '(keypress)': 'keyPressHandler($event)',
     '(textInput)': 'textInputHandler($event)',
+    '(input)': 'inputHandler($event)',
     '(blur)': 'blurHandler($event)'
   }
 })
@@ -43,7 +44,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   // the provided configuration object
   @Input() mentionConfig: MentionConfig = {items: []};
 
-  private activeConfig: MentionConfig;// = this.DEFAULT_CONFIG;
+  private activeConfig: MentionConfig; // = this.DEFAULT_CONFIG;
 
   private DEFAULT_CONFIG: MentionConfig = {
     items: [],
@@ -52,7 +53,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     maxItems: -1,
     debugEvents: false,
     mentionSelect: (item: any) => this.activeConfig.triggerChar + item[this.activeConfig.labelKey]
-  }
+  };
 
   // template to use for rendering list items
   @Input() mentionListTemplate: TemplateRef<any>;
@@ -100,7 +101,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   private updateConfig() {
-    let config = this.mentionConfig;
+    const config = this.mentionConfig;
     this.triggerChars = {};
     // use items from directive if they have been set
     if (this.mentionItems) {
@@ -116,7 +117,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   // add configuration for a trigger char
   private addConfig(config: MentionConfig) {
     // defaults
-    let defaults = Object.assign({}, this.DEFAULT_CONFIG);
+    const defaults = Object.assign({}, this.DEFAULT_CONFIG);
     config = Object.assign(defaults, config);
     // items
     let items = config.items;
@@ -124,7 +125,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
       // convert strings to objects
       if (typeof items[0] == 'string') {
         items = items.map((label) => {
-          let object = {};
+          const object = {};
           object[config.labelKey] = label;
           return object;
         });
@@ -155,8 +156,23 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     }
     nativeElement = this._element.nativeElement;
     if (this.lastKeyCode === KEY_BUFFERED) {
-      let keyCode = event.data.charCodeAt(0);
+      const keyCode = event.data.charCodeAt(0);
       this.keyHandler({keyCode: keyCode}, nativeElement);
+    }
+  }
+
+  // input event is fired on android
+  // usefull when we cannot disable autocorrect so we don't get textInput events
+  inputHandler(event: any, nativeElement: HTMLInputElement = this._element.nativeElement) {
+    if (this.mentionConfig.debugEvents) {
+      // tslint:disable-next-line:no-console
+      console.debug('mention.directive inputHandler:', event);
+    }
+    nativeElement = this._element.nativeElement;
+    // catch only composing events, they don't generate textInput
+    if (event.isComposing) {
+      const lastCharCode = event.data.charCodeAt(event.data.length);
+      this.keyHandler({keyCode: lastCharCode}, nativeElement);
     }
   }
 
@@ -173,7 +189,6 @@ export class MentionDirective implements OnChanges, AfterViewInit {
   }
 
   stopEvent(event: any) {
-    //if (event instanceof KeyboardEvent) { // does not work for iframe
     if (!event.wasClick) {
       event.preventDefault();
       event.stopPropagation();
@@ -204,7 +219,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     let pos = getCaretPosition(nativeElement, this.iframe);
     let charPressed = event.key;
     if (!charPressed) {
-      let charCode = event.which || event.keyCode;
+      const charCode = event.which || event.keyCode;
       if (!event.shiftKey && (charCode >= 65 && charCode <= 90)) {
         charPressed = String.fromCharCode(charCode + 32);
       } else {
@@ -220,7 +235,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     }
     //console.log("keyHandler", this.startPos, pos, val, charPressed, event);
 
-    let config = this.triggerChars[charPressed];
+    const config = this.triggerChars[charPressed];
     if (config) {
       this.activeConfig = config;
       this.startPos = pos;
@@ -330,7 +345,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
       let objects = this.activeConfig.items;
       // disabling the search relies on the async operation to do the filtering
       if (!this.disableSearch && this.searchString) {
-        let searchStringLowerCase = this.searchString.toLowerCase();
+        const searchStringLowerCase = this.searchString.toLowerCase();
         objects = objects.filter(e => e[this.activeConfig.labelKey].toLowerCase().startsWith(searchStringLowerCase));
       }
       matches = objects;
@@ -348,14 +363,14 @@ export class MentionDirective implements OnChanges, AfterViewInit {
 
   showSearchList(nativeElement: HTMLInputElement) {
     if (this.searchList == null) {
-      let componentFactory = this._componentResolver.resolveComponentFactory(MentionListComponent);
-      let componentRef = this._viewContainerRef.createComponent(componentFactory);
+      const componentFactory = this._componentResolver.resolveComponentFactory(MentionListComponent);
+      const componentRef = this._viewContainerRef.createComponent(componentFactory);
       this.searchList = componentRef.instance;
       this.searchList.position(nativeElement, this.iframe, this.activeConfig.dropUp);
       this.searchList.itemTemplate = this.mentionListTemplate;
       componentRef.instance['itemClick'].subscribe(() => {
         nativeElement.focus();
-        let fakeKeydown = {'keyCode': KEY_ENTER, 'wasClick': true};
+        const fakeKeydown = {'keyCode': KEY_ENTER, 'wasClick': true};
         this.keyHandler(fakeKeydown, nativeElement);
       });
     } else {
