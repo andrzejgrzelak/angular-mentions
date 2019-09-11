@@ -182,7 +182,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     }
     nativeElement = this._element.nativeElement;
     // catch only composing events, they don't generate textInput
-    if (event.isComposing) {
+    if (event.isComposing && event.data) {
       const lastCharCode = event.data.charCodeAt(event.data.length - 1);
       this.keyHandler({keyCode: lastCharCode}, nativeElement);
     }
