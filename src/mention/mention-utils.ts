@@ -1,8 +1,3 @@
-// DOM element manipulation functions...
-//
-
-import {forEach} from '@angular/router/src/utils/collection';
-
 function setValue(el: HTMLInputElement, value: any) {
   //console.log("setValue", el.nodeName, "["+value+"]");
   if (isInputOrTextAreaElement(el)) {
@@ -26,17 +21,17 @@ export function insertValue(
 ) {
   //console.log("insertValue", el.nodeName, start, end, "["+text+"]", el);
   if (isTextElement(el)) {
-    let val = getValue(el);
+    const val = getValue(el);
     setValue(el, val.substring(0, start) + text + val.substring(end, val.length));
     setTimeout(() => {
       setCaretPosition(el, start + text.length, iframe);
     }, 0);
   } else if (!noRecursion) {
-    let selObj: Selection = getWindowSelection(iframe);
+    const selObj: Selection = getWindowSelection(iframe);
     if (selObj && selObj.rangeCount > 0) {
-      var selRange = selObj.getRangeAt(0);
-      var position = selRange.startOffset;
-      var anchorNode = selObj.anchorNode;
+      const selRange = selObj.getRangeAt(0);
+      const position = selRange.startOffset;
+      const anchorNode = selObj.anchorNode;
       // if (text.endsWith(' ')) {
       //   text = text.substring(0, text.length-1) + '\xA0';
       // }
@@ -59,25 +54,27 @@ export function setCaretPosition(el: HTMLInputElement, pos: number, iframe: HTML
     el.focus();
     el.setSelectionRange(pos, pos);
   } else {
-    let range = getDocument(iframe).createRange();
+    const range = getDocument(iframe).createRange();
     range.setStart(el, pos);
     range.collapse(true);
-    let sel = getWindowSelection(iframe);
+    const sel = getWindowSelection(iframe);
     sel.removeAllRanges();
     sel.addRange(range);
   }
 }
 
 export function getCaretPosition(el: HTMLInputElement, iframe: HTMLIFrameElement = null) {
-  //console.log("getCaretPosition", el);
   if (isInputOrTextAreaElement(el)) {
-    var val = el.value;
-    return val.slice(0, el.selectionStart).length;
+    const val = el.value;
+    if (val.charAt(el.selectionStart) !== '@') {
+      return el.selectionStart - 1;
+    }
+    return el.selectionStart;
   } else {
-    var selObj = getWindowSelection(iframe); //window.getSelection();
+    const selObj = getWindowSelection(iframe);
     if (selObj.rangeCount > 0) {
-      var selRange = selObj.getRangeAt(0);
-      var position = selRange.startOffset;
+      const selRange = selObj.getRangeAt(0);
+      const position = selRange.startOffset;
       return position;
     }
   }
@@ -103,28 +100,28 @@ function getWindowSelection(iframe: HTMLIFrameElement): Selection {
 }
 
 export function getContentEditableCaretCoords(ctx: { iframe: HTMLIFrameElement, parent?: Element }) {
-  let markerTextChar = '\ufeff';
-  let markerId = 'sel_' + new Date().getTime() + '_' + Math.random().toString().substr(2);
-  let doc = getDocument(ctx ? ctx.iframe : null);
-  let sel = getWindowSelection(ctx ? ctx.iframe : null);
-  let prevRange = sel.getRangeAt(0);
+  const markerTextChar = '\ufeff';
+  const markerId = 'sel_' + new Date().getTime() + '_' + Math.random().toString().substr(2);
+  const doc = getDocument(ctx ? ctx.iframe : null);
+  const sel = getWindowSelection(ctx ? ctx.iframe : null);
+  const prevRange = sel.getRangeAt(0);
 
   // create new range and set postion using prevRange
-  let range = doc.createRange();
+  const range = doc.createRange();
   range.setStart(sel.anchorNode, prevRange.startOffset);
   range.setEnd(sel.anchorNode, prevRange.startOffset);
   range.collapse(false);
 
   // Create the marker element containing a single invisible character
   // using DOM methods and insert it at the position in the range
-  let markerEl = doc.createElement('span');
+  const markerEl = doc.createElement('span');
   markerEl.id = markerId;
   markerEl.appendChild(doc.createTextNode(markerTextChar));
   range.insertNode(markerEl);
   sel.removeAllRanges();
   sel.addRange(prevRange);
 
-  let coordinates = {
+  const coordinates = {
     left: 0,
     top: markerEl.offsetHeight
   };
