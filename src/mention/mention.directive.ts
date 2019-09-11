@@ -1,4 +1,16 @@
-import {AfterViewInit, ComponentFactoryResolver, Directive, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, TemplateRef, ViewContainerRef} from '@angular/core';
+import {
+  AfterViewInit,
+  ComponentFactoryResolver,
+  Directive,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  TemplateRef,
+  ViewContainerRef
+} from '@angular/core';
 
 import {MentionConfig} from './mention-config';
 import {MentionListComponent} from './mention-list.component';
@@ -171,7 +183,7 @@ export class MentionDirective implements OnChanges, AfterViewInit {
     nativeElement = this._element.nativeElement;
     // catch only composing events, they don't generate textInput
     if (event.isComposing) {
-      const lastCharCode = event.data.charCodeAt(event.data.length);
+      const lastCharCode = event.data.charCodeAt(event.data.length - 1);
       this.keyHandler({keyCode: lastCharCode}, nativeElement);
     }
   }
