@@ -66,7 +66,7 @@ export function setCaretPosition(el: HTMLInputElement, pos: number, iframe: HTML
 export function getCaretPosition(el: HTMLInputElement, iframe: HTMLIFrameElement = null) {
   if (isInputOrTextAreaElement(el)) {
     const val = el.value;
-    if (val.charAt(el.selectionStart) !== '@') {
+    if (val.charAt(el.selectionStart - 1) === '@') {
       return el.selectionStart - 1;
     }
     return el.selectionStart;
